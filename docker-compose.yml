@@ -1,0 +1,14 @@
+services:
+   frontend:
+     build: ./frontend
+     command: npm start
+   backend:
+     build: ./backend
+     command: npm run start
+     depends_on: database
+   database:
+     build: ./database
+     environment: 
+      - '${DATABASE_PASSWORD}'
+  #  nginx:
+  #    build: .

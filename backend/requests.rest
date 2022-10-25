@@ -1,0 +1,19 @@
+GET http://localhost:2000
+
+###
+
+POST http://localhost:2000/signIn
+Content-Type: application/json
+
+{
+    "username": "Hayk"
+}
+
+###
+
+POST http://localhost:2000/signUp
+Content-Type: application/json
+
+{
+    "username": "Hayk"
+}
