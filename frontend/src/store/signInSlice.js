@@ -17,19 +17,6 @@ export const signInThunk = createAsyncThunk(
      }
 );
 
-// export const authenticateThunk = createAsyncThunk(
-//     'signIn/authenticateThunk',
-//     async (_, { fulfillWithValue,rejectWithValue}) => {
-//        try {
-//          const api = '/api/isAuthenticated';
-//          const response = await axios.get(api);
-//             return fulfillWithValue(response.data);
-//        } catch (e) {
-//              return rejectWithValue(e.message);
-//        }
-//     }
-// );
-
 const signInSlice = createSlice({
     name: "signIn",
     initialState: {
@@ -42,24 +29,13 @@ const signInSlice = createSlice({
         }
     },
     extraReducers:{
-    [signInThunk.fulfilled]: (state, action) => {
-        console.log(action.payload);
-        state.signInResponse = action.payload;
-    },
-    [signInThunk.rejected]: (state, action) => {
-        state.signInResponse = action.payload;
-    },
-    // [authenticateThunk.fulfilled]: (state, action) => {
-    //     const isAuth = Boolean(action.payload.email);
-    //    if (!isAuth) {
-    //       state.user = {};
-    //    } else {
-    //       state.user = action.payload;
-    //    }
-    // },
-    // [authenticateThunk.rejected]: (state, action) => {
-    //     console.error(action.payload.message);
-    //  },
+        [signInThunk.fulfilled]: (state, action) => {
+            console.log(action.payload);
+            state.signInResponse = action.payload;
+        },
+        [signInThunk.rejected]: (state, action) => {
+            state.signInResponse = action.payload;
+        },
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 })

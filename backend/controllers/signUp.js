@@ -6,7 +6,6 @@ async function signUp(req, res){
     const exists = await searchUser(req.body.username);
     if (exists.rowCount) {
         res.json({message: "Already exists"});
-        return;
     } 
     else {
       const insertion = await insertUser(req.body.name, req.body.username, req.body.password);

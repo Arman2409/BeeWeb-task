@@ -28,13 +28,13 @@ const signUpSlice = createSlice({
         }
     },
     extraReducers:{
-    [signUpThunk.fulfilled]: (state, action) => {
-        state.signUpResponse = action.payload
-    },
-    [signUpThunk.rejected]: (state, action) => {
-        console.log(action.payload);
-        state.signUpResponse = action.payload;
-    }
+        [signUpThunk.fulfilled]: (state, action) => {
+            state.signUpResponse = action.payload
+        },
+        [signUpThunk.rejected]: (state, action) => {
+            console.log(action.payload);
+            state.signUpResponse = action.payload;
+        }
     }
 })
 

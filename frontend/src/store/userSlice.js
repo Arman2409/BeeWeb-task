@@ -19,17 +19,54 @@ export const uploadImageThunk = createAsyncThunk(
     }
 });
 
+export const getUserImageThunk = createAsyncThunk(
+  "user/getUserImage",
+  async (file, { fulfillWithValue,rejectWithValue}) => {
+      try {
+        const api = `/api/getUserImage`
+        const response = await axios.post(api, {token: file.token, filename: file.filename});
+        // console.log(response.data);
+        return fulfillWithValue(response.data);
+      } catch (e) {
+       if (!e.response) {
+         throw e
+       }
+         return rejectWithValue(e.response)
+  }
+});
+
 const userSlice = createSlice({
     name: "user",
     initialState: {
         user: null,
+        uploadInfo: {},
+        userImage: null,
     },
     reducers: {
-       setUser: (state, action) => {
-           state.user = action.payload;
-       }
+       clearUploadInfo: (state, action) => {
+         state.uploadInfo = {};
+       },
+       clearUserImage: (state, action) => {
+        state.userImage = "";
+      },
+    },
+    extraReducers:{
+      [uploadImageThunk.fulfilled]: (state, action) => {
+        state.uploadInfo = action.payload
+      },
+      [uploadImageThunk.rejected]: (state, action) => {
+        console.log(action.payload);
+        state.uploadInfo = action.payload;
+      },
+      [getUserImageThunk.fulfilled]: (state, action) => {
+        state.userImage = action.payload
+      },
+      [getUserImageThunk.rejected]: (state, action) => {
+        console.log(action.payload);
+        state.userImage = action.payload;
+      }
     }
 });
 
-export const { setUser } = userSlice.actions;
+export const { clearUploadInfo, clearUserImage } = userSlice.actions;
 export default userSlice.reducer;
