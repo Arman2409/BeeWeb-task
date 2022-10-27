@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -12,13 +10,18 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useDispatch, useSelector} from "react-redux";
+import { useNavigate } from 'react-router-dom';
+
+import { signUpThunk } from "../../store/signUpSlice";
+import Loading from "../Loading/Loading"
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="/">
+        ##
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -29,17 +32,75 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
+  const [loading, setLoading] = React.useState(false);
+  const [info, setInfo] = React.useState("");
+  const [infoColor, setInfoColor] = React.useState("red");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const signUpStatus = useSelector(function(state){
+    return state.signUp.signUpResponse;
+  })
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const firstName = data.get('firstName');
+    const secondName = data.get('lastName');
+    const username = data.get('username');
+    const password = data.get('password');
+    if (firstName.length < 2) {
+        setInfo("First name must be at least two symbols");
+        setInfoColor("red");
+        return;
+    }
+    if (secondName.length < 2) {
+      setInfo("Last name must be at least two symbols");
+      setInfoColor("red");
+      return;
+    }
+    if (username.length < 4) {
+      setInfo("Username must be at least four symbols");
+      setInfoColor("red");
+      return;
+    }
+    if (password.length < 8) {
+      setInfo("Password must be at least eight symbols");
+      setInfoColor("red");
+      return;
+    }
+    const newUser = {
+      name:firstName  + " " + secondName,
+      username,
+      password,
+    }
+    dispatch(signUpThunk(newUser));
+    setLoading(true);
   };
+
+  React.useEffect(() => {
+     console.log(signUpStatus);
+     setLoading(false);
+     if( typeof signUpStatus.message == "string") {
+         setInfo(signUpStatus.message);
+         if (signUpStatus.message == "User created") {
+          setInfoColor("green");
+         } 
+         else {
+          setInfoColor("red");
+         }
+     };
+  }, [signUpStatus]);
+
+   React.useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        navigate("/userPage");
+      };
+   }, []);
 
   return (
     <ThemeProvider theme={theme}>
+      {loading && <Loading />}
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -83,10 +144,10 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -100,11 +161,8 @@ export default function SignUp() {
                   autoComplete="new-password"
                 />
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
+              <Grid item xs={12} sx={{color:infoColor}}>
+               {info}
               </Grid>
             </Grid>
             <Button
@@ -117,7 +175,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/signIn" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>

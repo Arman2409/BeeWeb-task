@@ -17,60 +17,52 @@ export const signInThunk = createAsyncThunk(
      }
 );
 
-export const authenticateThunk = createAsyncThunk(
-    'signIn/authenticateThunk',
-    async (_, { fulfillWithValue,rejectWithValue}) => {
-       try {
-         const api = '/api/isAuthenticated';
-         const response = await axios.get(api);
-            return fulfillWithValue(response.data);
-       } catch (e) {
-             return rejectWithValue(e.message);
-       }
-    }
-);
+// export const authenticateThunk = createAsyncThunk(
+//     'signIn/authenticateThunk',
+//     async (_, { fulfillWithValue,rejectWithValue}) => {
+//        try {
+//          const api = '/api/isAuthenticated';
+//          const response = await axios.get(api);
+//             return fulfillWithValue(response.data);
+//        } catch (e) {
+//              return rejectWithValue(e.message);
+//        }
+//     }
+// );
 
 const signInSlice = createSlice({
-    name: "login",
+    name: "signIn",
     initialState: {
         isAuthenticated:null,
-        user: null,
-        signInResponse: null,
+        signInResponse: {},
     },
     reducers: { 
         clearResponse: (state,action) => {
-            state.signInResponse = null;
-        },
-        clearUser:(state, action) => {
-            state.user = {};
+            state.signInResponse = {};
         }
     },
     extraReducers:{
     [signInThunk.fulfilled]: (state, action) => {
-        if (!action.payload.email) {
-            state.signInResponse = action.payload;
-        } else {
-            state.signInResponse = action.payload;
-            state.user = action.payload;
-        }
+        console.log(action.payload);
+        state.signInResponse = action.payload;
     },
     [signInThunk.rejected]: (state, action) => {
         state.signInResponse = action.payload;
     },
-    [authenticateThunk.fulfilled]: (state, action) => {
-        const isAuth = Boolean(action.payload.email);
-       if (!isAuth) {
-          state.user = {};
-       } else {
-          state.user = action.payload;
-       }
-    },
-    [authenticateThunk.rejected]: (state, action) => {
-        console.error(action.payload.message);
-     },
+    // [authenticateThunk.fulfilled]: (state, action) => {
+    //     const isAuth = Boolean(action.payload.email);
+    //    if (!isAuth) {
+    //       state.user = {};
+    //    } else {
+    //       state.user = action.payload;
+    //    }
+    // },
+    // [authenticateThunk.rejected]: (state, action) => {
+    //     console.error(action.payload.message);
+    //  },
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 })
 
-export const {clearResponse, clearUser} = signInSlice.actions;
+export const {clearResponse} = signInSlice.actions;
 export default signInSlice.reducer;

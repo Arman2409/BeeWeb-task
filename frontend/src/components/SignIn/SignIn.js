@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -12,13 +10,20 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useSelector, useDispatch } from "react-redux";
+import jwt from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+
+import { clearResponse, signInThunk } from "../../store/signInSlice";
+import { setUser } from "../../store/userSlice";
+import Loading from "../Loading/Loading"
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="/">
+        ##
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -29,17 +34,61 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+  const [loading, setLoading] = React.useState(false);
+  const [info, setInfo] = React.useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const signInResponse = useSelector(function(state){
+    return state.signIn.signInResponse;
+  })
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    const username = data.get('username');
+    const password = data.get('password');
+    if (username.length < 4) {
+      setInfo("Username must be at least four symbols");
+      return;
+    }
+    if (password.length < 8) {
+      setInfo("Password must be at least 8 symbols");
+      return;
+    }
+    const loggingUser = ({
+      username,
+      password,
     });
+    dispatch(signInThunk(loggingUser));
+    setLoading(true);
   };
+
+  React.useEffect(() => {
+    console.log(signInResponse);
+     if (typeof signInResponse.message == "string") {
+      setInfo(signInResponse.message);
+      setLoading(false);
+     };
+     if (typeof signInResponse == "string"){
+      // const decoded = jwt(signInResponse);
+      localStorage.setItem("token", signInResponse);
+      setLoading(false);
+      dispatch(clearResponse());
+      navigate("/userPage");
+     }
+  }, [signInResponse]);
+
+  React.useEffect(() => {
+     const token = localStorage.getItem("token");
+     if (token) {
+       navigate("/userPage");
+     };
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
+      {loading && <Loading />}
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -61,10 +110,10 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="usernam"
+              label="Username"
+              name="username"
+              autoComplete=""
               autoFocus
             />
             <TextField
@@ -77,10 +126,9 @@ export default function SignIn() {
               id="password"
               autoComplete="current-password"
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            <Typography color="red" sx={{mt: 1}}>
+               {info}
+            </Typography>
             <Button
               type="submit"
               fullWidth
@@ -90,13 +138,8 @@ export default function SignIn() {
               Sign In
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/signUp" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

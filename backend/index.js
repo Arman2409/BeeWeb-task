@@ -2,58 +2,14 @@ import express from "express";
 import sessions from "express-session";
 import cors from "cors";
 import dotenv from "dotenv";
-import pg from "pg";
-import jwt from "jsonwebtoken";
-
+import path from "path";
 
 import logger from "./tools/logger.js";
+import upload from "./tools/multer.js";
+import authenticateToken from "./tools/authenticate.js";
 
-const {Client} = pg;
-
-const client = new Client({
-    database: "task",
-    user: "postgres",
-    password: "pass",
-    host: "localhost",
-    port: 5432
-});
-
-const insertUser = async (userName) => {
-    try {
-        await client.connect();           // gets connection
-        await client.query(
-            `INSERT INTO "users" ("username")  
-             VALUES ($1)`, [userName]); // sends queries
-        return true;
-    } catch (error) {
-        console.error(error.stack);
-        return false;
-    } finally {
-        console.log("inserted");
-        await client.end();              // closes connection
-    }
-};
-
-const searchUser = async (userName) => {
-    try {
-        await client.connect();           // gets connection
-        const info = await client.query(
-            'SELECT * FROM users WHERE username = ($1)', [userName]
-        );
-        await client.end();  
-        return info;
-    } catch (error) {
-        console.error(error.stack);
-        return false;
-    } finally {
-        console.log("final search")
-        // closes connection
-    }
-};
-// client.connect((err) => {
-//     if (err) throw err;
-//     logger.info("Connected to database")
-// })
+import signUp from "./controllers/signUp.js";
+import signIn from "./controllers/signIn.js";
 
 dotenv.config();
 const app = express();
@@ -62,33 +18,32 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+// app.use(express.urlencoded({
+//     extended: true
+// }));
 app.use(sessions({
     secret: process.env.SESSION_SECRET,
     saveUninitialized: true,
     resave: true,
 }));
+app.use((req, res, next) => {
+    logger.silly(req.url);
+    next();
+});
 
+// Routes
 
-app.get('/', (req, res) => res.send('Hello World!'));
+app.get('/', (req, res) => res.send('Server running!'));
 
-app.post('/signIn', (req, res) => {
+app.post('/api/signIn', signIn );
+app.post('/api/signUp', signUp );
+app.post('/api/uploadUserImage' ,  upload.single("image"), authenticateToken, (req, res) =>{
     console.log(req.body);
-    const user = searchUser(req.body.username);
-    console.log(user);
+    console.log(req.file);
+    console.log(req.user);
 });
-
-app.post('/signUp', (req, res) => {
-    const exists = searchUser(req.body.username);
-    if (exists.rowCount) {
-        res.send("Already exists");
-        return;
-    } 
-    else {
-      const insertion = insertUser(req.body.username);
-      console.log(insertion);
-      req.send("User created");
-    };
+app.post('api/getImage:name', (req, res) => {
+ req.senFile(path.resolve("./images/${req.params.image}"))
 });
-
 const port = 2000;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => logger.info(`App listening on port ${port}!`));

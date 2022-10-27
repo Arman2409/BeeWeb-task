@@ -1,0 +1,11 @@
+$mainColor1: #7e7bcd;
+$mainColor2: #5296d9;
+$mainColor3: #d0dce7;
+$backgroundColor1: rgb(127, 218, 127);
+
+:export {
+    mainColor1: $mainColor1;
+    mainColor2: $mainColor2;
+    mainColor3: $mainColor3;
+    backgroundColor1: $backgroundColor1;
+}

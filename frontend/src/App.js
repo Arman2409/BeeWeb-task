@@ -1,20 +1,27 @@
-import './App.css';
 import {BrowserRouter as Router,Routes,Route} from "react-router-dom";
 import {Provider} from "react-redux";
+
 import SignIn from './components/SignIn/SignIn';
 import SignUp from './components/SignUp/SignUp';
+import MainPage from './components/MainPage/MainPage';
 import store from './store/store';
+import UserPage from './components/UserPage/UserPage';
+import NotFound from "./components/NotFOund/NotFOund";
 
 function App() {
+ 
   return (
-    <Provider store={store}>
-      <Router>
-        <Routes>
-          <Route path="/signUp" element={<SignUp />}/>
-          <Route path="/signIn" element={<SignIn />}/>
-        </Routes>
-      </Router>
-    </Provider>
+    <Router>
+      <Provider store={store}>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/signUp" element={<SignUp />}/>
+            <Route path="/signIn" element={<SignIn />}/>
+            <Route path="/userPage" element={<UserPage />}/>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+      </Provider>
+    </Router>
   );
 }
 

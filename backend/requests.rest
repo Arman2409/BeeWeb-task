@@ -2,18 +2,22 @@ GET http://localhost:2000
 
 ###
 
-POST http://localhost:2000/signIn
+POST http://localhost:2000/api/signIn
 Content-Type: application/json
 
 {
-    "username": "Hayk"
+    "username": "Korenium",
+    "password": "Korenium",
+    "name": "Korenium"
 }
 
 ###
 
-POST http://localhost:2000/signUp
+POST http://localhost:2000/api/signUp
 Content-Type: application/json
 
 {
-    "username": "Hayk"
+    "username": "Korenium",
+    "password": "Korenium",
+    "name": "Korenium"
 }
