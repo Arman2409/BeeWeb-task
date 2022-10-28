@@ -6,7 +6,7 @@ The project consists of 3 parts: frontend, backend and database.To run it locall
 
 1. Run the following command in /frontend folder.
 
->> npm instal
+>> npm install
 
 2. Then run the following command from /frontend folder to run the frontend.
 
@@ -17,7 +17,7 @@ The project consists of 3 parts: frontend, backend and database.To run it locall
 
 1. Run the following command in /backend folder.
 
->> npm instal
+>> npm install
 
 2. Set the environment variables in /backend/.env file.
 
