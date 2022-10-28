@@ -9,7 +9,6 @@ export const uploadImageThunk = createAsyncThunk(
           const response = await axios.post(api,userData,{ headers: {   
             'Content-Type': 'application/x-www-form-urlencoded'
           }});
-          console.log(response.data);
           return fulfillWithValue(response.data);
         } catch (e) {
          if (!e.response) {
@@ -25,7 +24,6 @@ export const getUserImageThunk = createAsyncThunk(
       try {
         const api = `/api/getUserImage`
         const response = await axios.post(api, {token: file.token, filename: file.filename});
-        // console.log(response.data);
         return fulfillWithValue(response.data);
       } catch (e) {
        if (!e.response) {

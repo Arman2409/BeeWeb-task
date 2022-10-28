@@ -5,7 +5,7 @@ const updateUser = async (username, property, value) => {
     const client = new Client({
         database: "task",
         user: "postgres",
-        password: "123",
+        password: process.env.DATABASE_PASSWORD,
         host: "0.0.0.0",
         port: 5432
     });

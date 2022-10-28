@@ -3,7 +3,7 @@ import { Box, Typography} from '@mui/material';
 import {Link} from 'react-router-dom';
 import styleVariables from "../../styles/main.scss";
 
-const NotFound = () => {
+function NotFound() {
     return (
         <Box
         sx={{

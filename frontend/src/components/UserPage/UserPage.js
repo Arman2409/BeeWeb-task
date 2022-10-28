@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, TextField} from "@mui/material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import jwt from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { uploadImageThunk, getUserImageThunk, clearUploadInfo, clearUserImage } from "../../store/userSlice";
@@ -14,6 +14,7 @@ function UserPage () {
   const [imageState, setImageState] = useState("")
   const navigate = useNavigate();  
   const dispatch = useDispatch();
+  const location = useLocation();
   const uploadInfo = useSelector(function(state){
     return state.user.uploadInfo;
   })
@@ -49,37 +50,33 @@ function UserPage () {
     dispatch(uploadImageThunk(imageForm));
   };
 
-    useEffect(() => {
-       console.log(user);
-    }, [user]);
-
-    useEffect(() => {
-      console.log(uploadInfo);
+  useEffect(() => {
         if(uploadInfo.message) {
           setUploadStatus(uploadInfo.message);
         } else if (uploadInfo.token){
-          console.log({jwt: jwt(uploadInfo.token)});
-          console.log("setToken");
           localStorage.setItem("token", uploadInfo.token);
           setUploadStatus(uploadInfo.message);
         }
-    }, [uploadInfo]);
+  }, [uploadInfo]);
 
-    useEffect(() => {
+  useEffect(() => {
       if (userImage) {
         setImageState(`data:image/jpeg;base64, ${userImage}`);
       }
-    }, [userImage])
+   }, [userImage])
 
-    useEffect( () => {
+  useEffect( () => {
        const user = jwt(localStorage.getItem("token"));
-       console.log(user);
+       if (user.username !== location.pathname.slice(10,)){
+          navigate("/NotFound");
+       }
        setUser(user);
        if (user.filename) {
          dispatch(clearUserImage());
          dispatch(getUserImageThunk({filename:user.filename, token: localStorage.getItem("token")}));
        };
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
     return (
        <Box
@@ -123,7 +120,7 @@ function UserPage () {
                 }} >
                   {imageState ? 
                   <Box sx={{width: "100px", height: "100px"}}>
-                    <img src={imageState} style={{width: "100%", height: "100%"}}/>
+                    <img src={imageState} alt="Not found" style={{width: "100%", height: "100%"}}/>
                   </Box> :
                  <AccountCircleIcon 
                    sx={{

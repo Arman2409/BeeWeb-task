@@ -2,7 +2,6 @@ import searchUser from "../models/functions/Search.js";
 import insertUser from "../models/functions/Insert.js";
 
 async function signUp(req, res){
-    console.log(req.body);
     const exists = await searchUser(req.body.username);
     if (exists.rowCount) {
         res.json({message: "Already exists"});

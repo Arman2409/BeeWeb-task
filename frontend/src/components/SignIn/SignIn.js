@@ -15,7 +15,6 @@ import jwt from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 
 import { clearResponse, signInThunk } from "../../store/signInSlice";
-import { setUser } from "../../store/userSlice";
 import Loading from "../Loading/Loading"
 
 function Copyright(props) {
@@ -65,25 +64,27 @@ export default function SignIn() {
   };
 
   React.useEffect(() => {
-    console.log(signInResponse);
      if (typeof signInResponse.message == "string") {
       setInfo(signInResponse.message);
       setLoading(false);
      };
      if (typeof signInResponse == "string"){
-      // const decoded = jwt(signInResponse);
+      const decoded = jwt(signInResponse);
       localStorage.setItem("token", signInResponse);
       setLoading(false);
       dispatch(clearResponse());
-      navigate("/userPage");
+      navigate(`/userPage/${decoded.username}`);
      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signInResponse]);
 
   React.useEffect(() => {
      const token = localStorage.getItem("token");
      if (token) {
-       navigate("/userPage");
+      const decoded = jwt(token);
+       navigate(`/userPage/${decoded.username}`);
      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
